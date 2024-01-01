@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import useBreedList from "./useBreedList";
 import { useQuery } from "@tanstack/react-query";
 import fetchSearch from "./fetchSearch";
 import Results from "./Results";
+import AdoptedPetContext from "./AdoptedPetContext";
 
 const SearchParams = () => {
+  const [adoptedPet] = useContext(AdoptedPetContext);
   const ANIMALS = ["bird", "cat", "dog", "rabbit", "reptile"];
   const [animal, updateAnimal] = useState("");
   const [breeds] = useBreedList(animal);
@@ -27,15 +29,18 @@ const SearchParams = () => {
             location: formData.get("location") ?? "",
           };
           setRequestParams(obj);
-      }}
+        }}
       >
+        {
+          adoptedPet ? (
+            <div className="pet image-container">
+              <img src={adoptedPet.images[0]} alt={adoptedPet.name} />
+            </div>
+          ) : null // you have to remove this semi-colon, my auto-formatter adds it back if I delete it
+        }
         <label htmlFor="location">
           Location
-          <input
-            id="location"
-            name="location"
-            placeholder="Location"
-          />
+          <input id="location" name="location" placeholder="Location" />
         </label>
         <label htmlFor="animal">
           Animal
@@ -59,11 +64,7 @@ const SearchParams = () => {
         </label>
         <label htmlFor="breed">
           Breed
-          <select
-            disabled={!breeds.length}
-            id="breed"
-            name="breed"
-          >
+          <select disabled={!breeds.length} id="breed" name="breed">
             <option />
             {breeds.map((breed) => (
               <option key={breed} value={breed}>
